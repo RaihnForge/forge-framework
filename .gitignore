@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Temp/scratch
+.tempdocs/
+
+# Raw source binaries
+resources/raw/
+
+# Claude Code
+.claude/
