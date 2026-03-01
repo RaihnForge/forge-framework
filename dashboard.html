@@ -1475,8 +1475,6 @@ body {
   var viewerOverlay = document.getElementById('docviewer-overlay');
   var viewerBody = document.getElementById('docviewer-body');
   var viewerPath = document.getElementById('docviewer-path');
-  var isHosted = window.location.protocol === 'https:' || window.location.protocol === 'http:';
-
   function openViewer(filePath) {
     // Format path for breadcrumb display
     var parts = filePath.replace(/^\.\//, '').split('/');
@@ -1502,8 +1500,10 @@ body {
           viewerBody.innerHTML = marked.parse(text);
         }
       })
-      .catch(function (err) {
-        viewerBody.innerHTML = '<div class="docviewer-error">Could not load file: ' + escHtml(err.message) + '</div>';
+      .catch(function () {
+        // fetch blocked (e.g. Chrome on file://) — fall back to direct navigation
+        closeViewer();
+        window.open(filePath, '_blank');
       });
   }
 
@@ -1572,36 +1572,34 @@ body {
     }
   });
 
-  // Link interception — only when hosted (fetch won't work on file://)
-  if (isHosted) {
-    document.querySelector('.dashboard').addEventListener('click', function (e) {
-      var link = e.target.closest('a[href]');
-      if (!link) return;
-      var href = link.getAttribute('href');
-      if (!href) return;
-      // Only intercept relative links to .md or .csv files
-      if (href.match(/^https?:\/\//) || href.match(/^#/)) return;
-      if (href.match(/\.(md|csv)$/i)) {
-        e.preventDefault();
-        openViewer(href);
-      }
-    });
+  // Link interception — intercept .md/.csv clicks, try viewer, fall back on error
+  document.querySelector('.dashboard').addEventListener('click', function (e) {
+    var link = e.target.closest('a[href]');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (!href) return;
+    // Only intercept relative links to .md or .csv files
+    if (href.match(/^https?:\/\//) || href.match(/^#/)) return;
+    if (href.match(/\.(md|csv)$/i)) {
+      e.preventDefault();
+      openViewer(href);
+    }
+  });
 
-    // Also intercept drawer footer links (outside .dashboard)
-    var drawerFooterEl = document.getElementById('drawer-footer');
-    drawerFooterEl.addEventListener('click', function (e) {
-      var link = e.target.closest('a[href]');
-      if (!link) return;
-      var href = link.getAttribute('href');
-      if (!href) return;
-      if (href.match(/^https?:\/\//) || href.match(/^#/)) return;
-      if (href.match(/\.(md|csv)$/i)) {
-        e.preventDefault();
-        closeDrawer();
-        openViewer(href);
-      }
-    });
-  }
+  // Also intercept drawer footer links (outside .dashboard)
+  var drawerFooterEl = document.getElementById('drawer-footer');
+  drawerFooterEl.addEventListener('click', function (e) {
+    var link = e.target.closest('a[href]');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (!href) return;
+    if (href.match(/^https?:\/\//) || href.match(/^#/)) return;
+    if (href.match(/\.(md|csv)$/i)) {
+      e.preventDefault();
+      closeDrawer();
+      openViewer(href);
+    }
+  });
 
   // ── Init ─────────────────────────────────────
 
