@@ -201,7 +201,7 @@ The driving point is the same regardless of language: this phase produces a **cl
 - **Outgoing** — Active communications to stakeholders
 - **Compliance** — Regulatory and standards documentation
 - **Reports** — Formal status and outcome reports
-- **Fundings** — Financial documentation and justification
+- **Findings** — Financial documentation and justification
 - **Product** — Product documentation and release
 
 **Key Activities:**

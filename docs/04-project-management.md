@@ -138,7 +138,18 @@ Document known issues, potential risks, and mitigation strategies. This section 
 
 ## Project Classification
 
-Projects are categorized by the department they serve:
+Projects are categorized by the department they serve. The categories and examples will vary by organization — adapt to your own departments.
+
+**General pattern:**
+
+| Category | Description | Example |
+|----------|-------------|---------|
+| **Administration** | Internal operations, compliance, HR | Policy overhaul, SOC 2 certification |
+| **Product** | Core value creation and development | Feature release, product redesign |
+| **Clientele** | Client-facing initiatives | Onboarding program, branding refresh |
+| **Resources** | Infrastructure and tooling | System migration, vendor evaluation |
+
+**Real-world example (from a SaaS education company):**
 
 | Category | Description | Examples |
 |----------|-------------|----------|

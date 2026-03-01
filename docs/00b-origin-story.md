@@ -128,7 +128,7 @@ The Forge Framework has now been successfully implemented across multiple contex
 
 | Implementation | Type | Result |
 |---|---|---|
-| **Personal (Keyes Forge)** | Individual life management | Four-domain system managing all of Maslow's hierarchy |
+| **Personal (Keyes Forge)** | Individual life management | Five-domain system managing all of Maslow's hierarchy |
 | **Kelvin Education** | SaaS startup | Full organizational restructure + SOC 2 certification path |
 | **Zachary Rankin Family** | Personal/family | Framework adapted for family organization |
 | **Fourth State Communications** | Defense technology startup | Organizational structure, security controls, CMMC compliance |

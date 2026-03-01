@@ -47,16 +47,17 @@ The Forge Framework has been applied across multiple organizations and contexts,
 
 **Type:** Full personal life management
 **Prefix:** `KF`
-**Context:** Joshua Keyes applies the Forge Framework to his entire life, using Maslow's Hierarchy of Needs as the organizing principle for four personal "Forges."
+**Context:** Joshua Keyes applies the Forge Framework to his entire life, using Maslow's Hierarchy of Needs as the organizing principle for five personal "Forges."
 
-### The Four Personal Forges
+### The Five Personal Forges
 
 | Forge | Prefix | Domain | Maslow's Layer |
 |-------|--------|--------|---------------|
 | **HomeForge** (HearthForge) | `KF.HF` | Shelter, Food, Security | Physiological & Safety |
+| **HealthForge** | `KF.HeF` | Fitness, Nutrition, Wellness | Physiological (health-specific) |
 | **UnchosenForge** | `KF.UF` | Work, Business, Freelance | Esteem through livelihood |
 | **RaihnForge** | `KF.R` | Art, Career, Skills | Esteem through craft & expression |
-| **PaladinForge** | `KF.PF` | Social, Spiritual, Health, Self-actualization | Love/Belonging & Self-actualization |
+| **PaladinForge** | `KF.PF` | Social, Spiritual, Self-actualization | Love/Belonging & Self-actualization |
 
 ### RaihnForge — Art, Career, Skills
 
@@ -84,15 +85,30 @@ The work and business forge. Freelance operations, client projects, business adm
 
 The foundational forge covering Maslow's base needs. Shelter, sustenance, physical security, household management — the non-negotiable foundation everything else is built upon.
 
-### PaladinForge — Social, Spiritual, Health, Self-Actualization
+### HealthForge — Fitness, Nutrition, Wellness
+
+**Prefix:** `KF.HeF`
+
+The health and wellness forge. Covers the physiological needs specific to maintaining and improving the body: fitness routines, nutrition tracking, medical care, and general wellness. Separated from PaladinForge to give health its own dedicated attention — because when health is bundled with higher-calling pursuits, it tends to get deprioritized.
+
+### PaladinForge — Social, Spiritual, Self-Actualization
 
 **Prefix:** `KF.PF`
 
-The higher-calling forge. Named for the Paladin archetype — the holy warrior, protector, moral compass. Covers the upper tiers of Maslow's hierarchy: social belonging, spiritual life, physical and mental health, and the pursuit of self-actualization.
+The higher-calling forge. Named for the Paladin archetype — the holy warrior, protector, moral compass. Covers the upper tiers of Maslow's hierarchy: social belonging, spiritual life, athletics and peak performance, and the pursuit of self-actualization.
 
 ### Key Insight
 
 By mapping personal life domains to Maslow's Hierarchy, the Forge Framework ensures that no aspect of life is neglected. Each forge gets the same structural rigor (Action Logs, Functional Folders, etc.), which means personal life management receives the same deliberate design as corporate operations. The framework scales down to a single person just as naturally as it scales up to an enterprise.
+
+---
+
+## Implementation: Zachary Rankin Family
+
+**Type:** Personal/family
+**Context:** Framework adapted for family organization by Zachary Rankin, a colleague introduced to the system.
+
+> Full case study pending — to be developed from direct interviews. See evidence collection plan.
 
 ---
 

@@ -98,10 +98,13 @@ The Forge Framework enforces three RBAC principles:
 
 The RBAC Matrix maps roles to system access levels:
 
-| Role Category | Job Code | Systems & Access Levels |
-|---------------|----------|------------------------|
-| Executive (CEO, CPO, COO, CRO, CTO) | EX-001 through EX-005 | Manager-level access across systems |
-| [Additional roles] | [Job codes] | [Access levels per system] |
+| Role Category | Job Code | Google Workspace | Shared Drives | Financial Systems |
+|---------------|----------|-----------------|---------------|-------------------|
+| Executive (CEO, CTO) | EX-001, EX-005 | Admin | Manager (all depts) | Manager |
+| Executive (CPO, COO, CRO) | EX-002–004 | NA | Manager (all depts) | Manager |
+| Project Manager | PM-001 | Contributor | Contributor (assigned depts) | Viewer |
+| Developer | DV-001 | Contributor | Contributor (Developer only) | NA |
+| Administrative Staff | AD-001 | Contributor | Contributor (Administration only) | Viewer |
 
 **Systems tracked:**
 - Google Workspace (MFA required)

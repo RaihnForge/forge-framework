@@ -20,7 +20,7 @@ Master Reference (docs/)
 
 ## Status
 
-Not yet started. Building Master Reference and Evidence Collection first.
+Draft v1 complete. Master Reference substantially built. Evidence Collection in planning.
 
 ## Planned Structure (Draft)
 

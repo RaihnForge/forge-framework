@@ -104,7 +104,7 @@ This is why:
 - Business departments typically number **4-5** (Admin, Clientele, Product, Resources)
 - Functional folders number **5** (Action Log, Queue, Projects, Binder, Archive)
 - Action ticket fields number **6** (Action Item #, Who, What, When, Where, How)
-- Express domains number **5** (Outgoing, Compliance, Reports, Fundings, Product)
+- Express domains number **5** (Outgoing, Compliance, Reports, Findings, Product)
 
 None of these numbers are accidental. They are calibrated to the limits of human cognition.
 
