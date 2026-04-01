@@ -31,3 +31,9 @@ A theory of organizational management for individuals and organizations.
 - **Voice:** Direct, practical, philosophical. No fluff, no filler.
 - **Allegories are core:** Plot of Land / Fiefdom (Lord = Control, Scribe = Monitor, Castle = Folders, Village = Processes, Output = Evidence).
 - **Universal design principles:** Scalability, maintainability, reliability. Methodology-agnostic infrastructure.
+
+## Workflow Rules
+
+- Complete ALL tiers/phases of a plan before moving on. Do not skip ahead or start new phases prematurely.
+- Always update KPSP-Shard.md and ARCHITECTURE.md after implementing features or completing plans. Proactively prune completed items.
+- Verify you are editing files in the CORRECT project directory before making changes. Check ownership boundaries.

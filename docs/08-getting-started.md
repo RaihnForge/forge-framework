@@ -140,30 +140,74 @@ As confidence grows, layer in additional framework elements:
 
 ---
 
-## The Primary Failure Mode
+## The Four C's Applied to Getting Started
 
-> **Over-ambition from the start.**
+The Four C's — Competence, Confidence, Comfort, Compliance — describe the inevitable maturation sequence for any capability (see [00c-core-concepts.md](00c-core-concepts.md#the-four-cs-capability-maturation) for the full treatment).
 
-The number one mistake when implementing the Forge Framework is trying to build the entire system at full complexity on day one.
-
-**Let the system grow as your confidence and competencies grow.** This applies to both:
-- The **complexity of the FORGE structure** — don't set up 5 levels of nested folders before you've mastered a simple Action Log
-- The **tools used to implement it** — don't buy Jira licenses before you've proven the system works on paper
-
-The failure state is **over-complexity before system comfort, confidence, competence, and compliance.**
-
-### The Four C's of Readiness
+Applied to framework adoption, this means: **let the system grow as your maturation grows.**
 
 Before adding complexity, honestly assess:
 
-| C | Question |
-|---|----------|
-| **Comfort** | Am I comfortable with the current level of the system? Does it feel natural? |
-| **Confidence** | Do I trust the system? Am I using it consistently? |
-| **Competence** | Am I skilled enough with the current tools to add more without confusion? |
-| **Compliance** | Am I actually following the system I've built? Or am I ignoring parts of it? |
+| Stage | Question |
+|-------|----------|
+| **Competence** | Can I operate the current level of the system correctly? |
+| **Confidence** | Have I tested it under real conditions and seen it work? Do I trust it? |
+| **Comfort** | Does it feel natural? Is execution effortless? |
+| **Compliance** | Am I maintaining it consistently over time without external pressure? |
 
 If any answer is "no," don't add more. Strengthen what you have. The Forge Framework at its simplest — domains on paper, a to-do list, and a calendar — is more powerful than a complex system that isn't used.
+
+---
+
+## Failure Modes
+
+### Over-Ambition from the Start
+
+> The primary failure mode.
+
+Trying to build the entire system at full complexity on day one. Setting up 5 levels of nested folders before you've mastered a simple Action Log. Buying Jira licenses before you've proven the system works on paper. Demanding Compliance-level structure from yourself at the Competence stage.
+
+The failure state is over-complexity before capability maturation.
+
+### Over-Consolidation
+
+One master Action Log for your entire life. Feels simpler, actually creates cognitive overload. Defeats the framework's splintering principle — each domain gets its own Action Log because each domain is a cognitive context. Consolidation trades organizational simplicity for cognitive overload. See [03-functional-folders.md](03-functional-folders.md#action-log-scope-why-each-forge-gets-its-own) for the full reasoning.
+
+### Action Log Staleness
+
+The Action Log only grows, never cycles. Over months, older items accumulate — technically open but no longer urgent or relevant. The whiteboard becomes a guilt ledger. The dashboard loses its value. The fix is deliberate cycling — see [03-functional-folders.md](03-functional-folders.md#action-log-maintenance-the-staleness-problem).
+
+### Skipping Express
+
+Work gets done but never documented, communicated, or closed. The FORGE cycle stalls at Generate. Evidence is never captured. Lessons are never exported. The next cycle starts no stronger than the last. This is one of the most common failure modes because Express feels like overhead after the work is "done" — but without it, the cycle cannot feed back into itself and continuous improvement breaks down.
+
+### Structure as Overhead
+
+Documentation and organization slow completion instead of enabling it. The ETTO trade-off has tipped too far toward Thoroughness. The system is maintained for its own sake rather than for the outcomes it produces. The vehicle has become a show car — meticulously detailed but never driven. If bureaucracy is slowing completion instead of enabling it, you are in the wrong. Scale back to the level where the structure serves the work.
+
+### Folder Decay
+
+Queue items that should have moved to Archive months ago. Projects that finished but were never closed. Binder material that is outdated. The state machine's core promise — location equals status — degrades when items are in the wrong state. If something is in Queue but hasn't been touched in three months, the state machine is lying. Regular reconciliation — even informal — keeps the states honest.
+
+### Permanent Crisis Mode
+
+Using triage prioritization as a long-term operating mode. Domains wither not from deliberate trade-offs but from lost perspective. The framework makes neglect visible through Action Logs, folder states, and color-coded calendars — but visibility only helps if you look. The Plot of Land allegory exists specifically because this failure mode was learned through painful experience. Check your plots regularly.
+
+### Judging Before Operating
+
+Dismissing the framework's capability before achieving Competence with it. The Honda Civic driver who has never learned to use the Porsche's manual transmission concluding that the Civic is the better car. You cannot evaluate a system you have not genuinely operated. Competence must precede Confidence — including the confidence to reject.
+
+### Director Buy-In Failure
+
+Leadership mandates the framework but doesn't operate within it themselves. Culture follows behavior, not directives. If leadership isn't visibly using the Action Logs, the folder structure, and the meeting lifecycle, the message to everyone else is: "this is for you, not for me." Without director buy-in, conformity pressure runs the wrong direction — less disciplined culture pulls adopters back down.
+
+### Stakeholder Adoption Failure
+
+Even with director buy-in, the people doing the work resist. This is a change management challenge requiring sustained effort — not a one-time rollout. People revert to old habits, find workarounds, do the minimum. The Four C's maps the adoption path: Competence (teach them), Confidence (they test it and see it work), Comfort (it becomes natural), Compliance (they maintain it independently). **Patience is key.** Practitioners will mature at different rates. This is expected and produces good friction — more mature adopters create visible results that pressure less mature ones toward adoption, so long as director buy-in maintains the standard.
+
+### The Framework's Invitation to Fail
+
+The Forge Framework invites its own failure. If it does not hold under real conditions, it *should* fail. If adoption reveals that a concept does not work, the concept should be revised. The framework is not precious — it is a hypothesis under continuous testing. Each implementation either validates the structure or reveals where it needs to change. That is the Express phase applied to the framework itself.
 
 ---
 

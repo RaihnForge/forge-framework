@@ -67,6 +67,45 @@ Department Drive
 
 **Classification:** Action Logs may carry security classifications (e.g., `CLASSIFICATION: RESTRICTED`)
 
+### Action Log Maintenance: The Staleness Problem
+
+An Action Log that only grows will eventually stop working. As items accumulate over weeks and months, older entries create noise — they're technically "open" but have lost urgency or relevance. The whiteboard becomes cluttered. The signal-to-noise ratio degrades, and the Action Log shifts from a priority reference into a guilt-inducing backlog.
+
+This is not a flaw in the framework — it is an operational reality that requires deliberate maintenance.
+
+**The MON lifecycle already provides the mechanism.** Action Logs are Monitor documents. When a Monitor document is superseded, it becomes Evidence. Apply this to the Action Log itself:
+
+- **Cycle the log periodically** — `HomeForge_ActionLog_2026Q1` becomes dated evidence when `HomeForge_ActionLog_2026Q2` takes its place. The new log starts clean, carrying forward only items that still warrant active attention.
+- **Review before cycling** — When creating a new Action Log, deliberately assess each open item from the prior log. Items that are still relevant carry forward. Items that have gone stale are either closed, moved to the Void Forge as do-not-do's, or archived as evidence of what was considered.
+- **The cycle period depends on operational tempo** — A high-volume department might cycle monthly. A personal Forge might cycle quarterly. The right interval is whenever the log starts feeling heavy rather than useful.
+
+The principle: **an Action Log should always feel like a whiteboard, not a ledger.** If it feels like a ledger, it's time to cycle it.
+
+### Action Log Scope: Why Each Forge Gets Its Own
+
+A single-person system could reasonably consolidate everything into one root Action Log with Forges as process folders beneath it. This is a valid architecture — and it's wrong for most people.
+
+The reason is cognitive, not organizational.
+
+When you sit down to work in RaihnForge, you don't want to see your medical appointments, your mortgage tasks, and your client deliverables. Those belong to other Forges. If they're visible, they compete for working memory — even passively. The mind doesn't ignore open items on a list just because they're in a different category. It processes them, worries about them, and loses capacity for the work at hand.
+
+**Each Forge gets its own Action Log because each Forge is a cognitive context.** When you enter a Forge, you narrow your mental aperture to that domain. The Action Log for that Forge shows only that domain's work. Your working memory isn't competing with the other domains — it's fully allocated to this one.
+
+This is the "Virtual RAM" principle made operational. You're not just organizing files — you're managing cognitive load by controlling what's *visible* at any given time. Each Forge is a context switch with a clean workspace.
+
+**The scaling rule:** An Action Log exists wherever a decision-maker needs an independent view of work.
+
+| Scale | Action Log Placement | Reasoning |
+|-------|---------------------|-----------|
+| **Single person, personal life** | One per Forge (5-9 logs) | Each Forge is a cognitive context requiring dedicated focus |
+| **Single person, one business** | One per department (4-5 logs) | Same principle — each department is a context |
+| **Team with managers** | One per manager's scope | Each manager needs an independent view of their domain |
+| **Organization** | One per department + sub-logs per process as needed | Logs multiply with decision-making authority |
+
+The temptation to consolidate into fewer logs is understandable — it feels simpler. But it trades organizational simplicity for cognitive overload. The deliberate splintering of attention across dedicated contexts is what enables expanded consciousness within each one. Instead of wrestling your entire life at once, you drop all other considerations for dedicated effort in one domain, expanding your cognitive capacity within that slice.
+
+This is not duplication. It is leverage.
+
 ---
 
 ## 2. Queue (The Desk)
@@ -154,6 +193,10 @@ Ask yourself:
 - Policy summaries
 
 **Key distinction:** Binder is for *living reference material* — things you need today and tomorrow. Not historical (that's Archive) and not active work (that's Queue/Projects).
+
+**Cross-department role:** The Binder also serves as an **airlock or API port** for the department. When information needs to be exported to external departments, stakeholders, or audiences, it passes through the Binder. Internal utility tools and support processes (e.g., a shared code library) are Process folders, not Binder material — they serve internal operations. But a *report about* that library for an external stakeholder would live in the Binder. The Binder is where internal work becomes externally visible.
+
+*Implementation note (Keyes Dev Studio, 2026-03-25): When applying the Forge Framework to a software development department, the shared tools repository (sanctum) was initially mapped to the Binder. On closer analysis, sanctum is a Process folder — an internal utility product consumed by other projects. The Binder distinction became clear when considering: "If the CEO asked for a report on our dependency vs proprietary ecosystem, where would it live?" The report would pull data FROM sanctum but exist IN the Binder. Sanctum is the workshop; the Binder is the export dock.*
 
 ---
 
