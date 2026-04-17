@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Forge Framework — Reader</title>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FORGE FRAMEWORK — READER
+     Shareable static reader for docs/, guide/, evidence/, and
+     source-documents/. Feedback via mailto (zero backend).
+     Works on file:// and GitHub Pages.
+     ═══════════════════════════════════════════════════════════════ -->
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+:root {
+  --bg-deep:       #0f0d0b;
+  --bg-surface:    #1c1814;
+  --bg-raised:     #261f18;
+  --bg-hover:      #332a20;
+  --bg-inset:      #120f0c;
+  --bg-prose:      #1a1612;
+
+  --accent:        #e8761a;
+  --accent-glow:   #f5a623;
+  --accent-dim:    #a85a12;
+
+  --green:         #4a7c59;
+  --red:           #a04040;
+
+  --text:          #e8ddd0;
+  --text-muted:    #9a8b7a;
+  --text-dim:      #6b5e52;
+
+  --border:        #2e261e;
+  --border-light:  #3d3228;
+
+  --font-body:     Georgia, 'Times New Roman', serif;
+  --font-mono:     'Courier New', Courier, monospace;
+
+  --radius:        6px;
+  --radius-lg:     10px;
+  --transition:    0.2s ease;
+
+  --sidebar-w:     320px;
+  --prose-max:     760px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a { color: var(--accent-glow); text-decoration: none; }
+a:hover { color: var(--accent); text-decoration: underline; }
+
+/* ─────────────────────────────────────────────
+   SHELL LAYOUT
+   ───────────────────────────────────────────── */
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+}
+
+/* ─────────────────────────────────────────────
+   SIDEBAR
+   ───────────────────────────────────────────── */
+.sidebar {
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  padding: 1.25rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-light) var(--bg-surface);
+}
+
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-track { background: var(--bg-surface); }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+.brand {
+  padding: 0 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.brand-title {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.brand-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+.brand-author {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+}
+
+.nav-section {
+  margin-bottom: 0.5rem;
+}
+
+.nav-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.5rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition);
+}
+
+.nav-section-header:hover { background: var(--bg-raised); }
+
+.nav-chevron {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  transition: transform var(--transition);
+  flex-shrink: 0;
+  width: 8px;
+}
+
+.nav-section.open .nav-chevron { transform: rotate(90deg); }
+
+.nav-section-label {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.nav-section-count {
+  margin-left: auto;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.nav-items {
+  display: none;
+  padding: 0.25rem 0;
+}
+
+.nav-section.open .nav-items { display: block; }
+
+.nav-item {
+  display: block;
+  padding: 0.4rem 1.5rem 0.4rem 2.5rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+
+.nav-item:hover {
+  background: var(--bg-raised);
+  color: var(--accent-glow);
+  text-decoration: none;
+}
+
+.nav-item.active {
+  background: var(--bg-raised);
+  border-left-color: var(--accent);
+  color: var(--accent-glow);
+}
+
+.nav-item-num {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-right: 0.5rem;
+  min-width: 1.6rem;
+}
+
+.nav-item.active .nav-item-num { color: var(--accent); }
+
+/* ─────────────────────────────────────────────
+   MAIN CONTENT
+   ───────────────────────────────────────────── */
+.main {
+  padding: 0 2.5rem 4rem;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg-deep);
+  padding: 1.25rem 0;
+  margin: 0 -2.5rem 1.5rem;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  min-width: 0;
+}
+
+.breadcrumb .sep { color: var(--text-dim); margin: 0 0.35rem; }
+.breadcrumb .current { color: var(--accent); }
+
+.topbar-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+.btn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 0.45rem 0.85rem;
+  background: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-dim);
+  color: var(--accent-glow);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  color: var(--bg-deep);
+}
+
+/* ─────────────────────────────────────────────
+   PROSE
+   ───────────────────────────────────────────── */
+.prose {
+  max-width: var(--prose-max);
+  margin: 0 auto;
+  padding: 1rem 0 2rem;
+  font-size: 1.02rem;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  margin: 2.2rem 0 0.8rem;
+  line-height: 1.3;
+  letter-spacing: 0.3px;
+}
+
+.prose h1 {
+  font-size: 2rem;
+  border-bottom: 2px solid var(--accent-dim);
+  padding-bottom: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.prose h2 {
+  font-size: 1.45rem;
+  color: var(--accent-glow);
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 0.35rem;
+}
+
+.prose h3 { font-size: 1.18rem; color: var(--text); }
+.prose h4 { font-size: 1.02rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+.prose p { margin: 0.9rem 0; }
+
+.prose strong { color: var(--accent-glow); font-weight: 700; }
+.prose em { color: var(--text); }
+
+.prose ul, .prose ol { margin: 0.9rem 0 0.9rem 1.5rem; }
+.prose li { margin: 0.35rem 0; }
+.prose li > ul, .prose li > ol { margin-top: 0.25rem; margin-bottom: 0.25rem; }
+
+.prose blockquote {
+  margin: 1rem 0;
+  padding: 0.6rem 1.1rem;
+  border-left: 3px solid var(--accent-dim);
+  background: var(--bg-prose);
+  color: var(--text-muted);
+  font-style: italic;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.prose blockquote p { margin: 0.4rem 0; }
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--bg-inset);
+  color: var(--accent-glow);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+.prose pre {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.prose pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text);
+  font-size: inherit;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.92rem;
+  background: var(--bg-prose);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.prose th {
+  background: var(--bg-raised);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.prose td {
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.prose tr:last-child td { border-bottom: none; }
+.prose tr:hover td { background: var(--bg-hover); }
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--border-light);
+  margin: 2rem 0;
+}
+
+.prose img { max-width: 100%; border-radius: var(--radius); }
+
+.prose a { color: var(--accent-glow); border-bottom: 1px dotted var(--accent-dim); }
+.prose a:hover { border-bottom-style: solid; text-decoration: none; }
+
+/* ─────────────────────────────────────────────
+   STATES
+   ───────────────────────────────────────────── */
+.welcome {
+  max-width: var(--prose-max);
+  margin: 2rem auto;
+  padding: 2.5rem 2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.welcome h1 {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 1.9rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+}
+
+.welcome .tagline {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 1.05rem;
+  margin-bottom: 1.5rem;
+}
+
+.welcome-suggest {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.suggest-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-decoration: none;
+  color: var(--text);
+  display: block;
+}
+
+.suggest-card:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-dim);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.suggest-card-title {
+  font-family: var(--font-mono);
+  color: var(--accent-glow);
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.suggest-card-desc {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.error { color: var(--red); }
+
+/* ─────────────────────────────────────────────
+   FEEDBACK FOOTER
+   ───────────────────────────────────────────── */
+.feedback {
+  max-width: var(--prose-max);
+  margin: 2.5rem auto 0;
+  padding: 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.feedback-prompt {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.9rem;
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.vote-btn {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  padding: 0.55rem 1.2rem;
+  background: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vote-btn:hover {
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.vote-btn.up:hover { border-color: var(--green); color: var(--green); }
+.vote-btn.down:hover { border-color: var(--red); color: var(--red); }
+
+.vote-btn.voted {
+  background: var(--bg-hover);
+  cursor: default;
+}
+
+.vote-btn.voted.up { border-color: var(--green); color: var(--green); }
+.vote-btn.voted.down { border-color: var(--red); color: var(--red); }
+
+.vote-btn-label { font-size: 0.85rem; font-family: var(--font-mono); }
+
+.feedback-detail {
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+.feedback-detail a {
+  color: var(--text-muted);
+  border-bottom: 1px dotted var(--text-dim);
+}
+
+.feedback-detail a:hover { color: var(--accent-glow); border-color: var(--accent-dim); }
+
+/* ─────────────────────────────────────────────
+   MOBILE
+   ───────────────────────────────────────────── */
+.menu-toggle {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.85rem;
+  background: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 20;
+}
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: 1fr; }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    width: 85%;
+    max-width: 340px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-backdrop.open { display: block; }
+
+  .menu-toggle { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+  .main { padding: 0 1.25rem 3rem; }
+  .topbar { margin: 0 -1.25rem 1.25rem; padding-left: 1.25rem; padding-right: 1.25rem; }
+  .prose { font-size: 0.98rem; }
+  .prose h1 { font-size: 1.6rem; }
+  .prose h2 { font-size: 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="backdrop"></div>
+
+<div class="shell">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-title">The Forge Framework</div>
+      <div class="brand-subtitle">A theory of organizational management</div>
+      <div class="brand-author">by Joshua Keyes</div>
+    </div>
+    <nav id="nav"></nav>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main">
+    <div class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰ Menu</button>
+      <div class="breadcrumb" id="breadcrumb">The Forge Framework</div>
+      <div class="topbar-actions">
+        <a class="btn" id="feedbackBtn" href="#">✉ Send feedback</a>
+      </div>
+    </div>
+
+    <div id="content"></div>
+  </main>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ═══════════════════════════════════════════════════════════════
+  // CONFIG — nav structure. Paths relative to reader.html.
+  // ═══════════════════════════════════════════════════════════════
+  var FEEDBACK_EMAIL = 'joshua.keyes@gmail.com';
+  var FEEDBACK_SUBJECT = 'Forge Framework';
+
+  var SECTIONS = [
+    {
+      id: 'overview',
+      label: 'Start Here',
+      open: true,
+      items: [
+        { path: 'README.md',     title: 'README',       num: '✦' },
+        { path: 'DESIGN.md',     title: 'Design',       num: '✦' },
+        { path: 'ARCHITECTURE.md', title: 'Architecture', num: '✦' }
+      ]
+    },
+    {
+      id: 'docs',
+      label: 'Docs — Master Reference',
+      open: true,
+      items: [
+        { path: 'docs/00-overview.md',                title: 'Overview',                num: '00' },
+        { path: 'docs/00a-philosophy.md',             title: 'Philosophy',              num: '00a' },
+        { path: 'docs/00b-origin-story.md',           title: 'Origin Story',            num: '00b' },
+        { path: 'docs/00c-core-concepts.md',          title: 'Core Concepts',           num: '00c' },
+        { path: 'docs/01-forge-cycle.md',             title: 'The FORGE Cycle',         num: '01' },
+        { path: 'docs/02-organizational-structure.md',title: 'Organizational Structure',num: '02' },
+        { path: 'docs/03-functional-folders.md',      title: 'Functional Folders',      num: '03' },
+        { path: 'docs/04-project-management.md',      title: 'Project Management',      num: '04' },
+        { path: 'docs/05-controls-and-security.md',   title: 'Controls & Security',     num: '05' },
+        { path: 'docs/06-naming-conventions.md',      title: 'Naming Conventions',      num: '06' },
+        { path: 'docs/07-implementations.md',         title: 'Implementations',         num: '07' },
+        { path: 'docs/08-getting-started.md',         title: 'Getting Started',         num: '08' },
+        { path: 'docs/PROJECT-SUMMARY-PLAN.md',       title: 'Project Summary Plan',    num: '✦' }
+      ]
+    },
+    {
+      id: 'guide',
+      label: 'Guide — Published Draft',
+      open: false,
+      items: [
+        { path: 'guide/README.md',                         title: 'About the Guide',  num: '✦' },
+        { path: 'guide/forge-framework-guide-draft-v1.md', title: 'Guide Draft v1',   num: '✦' }
+      ]
+    },
+    {
+      id: 'evidence',
+      label: 'Evidence',
+      open: false,
+      items: [
+        { path: 'evidence/README.md', title: 'Evidence Index', num: '✦' }
+      ]
+    },
+    {
+      id: 'source',
+      label: 'Source Documents',
+      open: false,
+      items: [
+        { path: 'resources/source-documents/INDEX.md',                                 title: 'Source Index',           num: '✦' },
+        { path: 'resources/source-documents/4S-Index.md',                              title: '4S Index',               num: '4S' },
+        { path: 'resources/source-documents/4S-Security-MasterControl.md',             title: '4S Security Master',     num: '4S' },
+        { path: 'resources/source-documents/ForgeFramework-Presentation-4S.md',        title: 'Presentation — 4S',      num: '✦' },
+        { path: 'resources/source-documents/ForgeFramework-Presentation-Kelvin-Longhorn.md', title: 'Presentation — Kelvin/Longhorn', num: '✦' },
+        { path: 'resources/source-documents/Forge-Framework-Handwritten-Notes.md',     title: 'Handwritten Notes',      num: '✎' },
+        { path: 'resources/source-documents/Forge-Framework-Schedule.md',              title: 'Schedule',               num: '✎' },
+        { path: 'resources/source-documents/Notes-John-Josh-Sync.md',                  title: 'Notes — John/Josh Sync', num: '✎' },
+        { path: 'resources/source-documents/Project-Summary-Plan-Detail.md',           title: 'PSP — Detail',           num: '✎' },
+        { path: 'resources/source-documents/Project-Summary-Plan-MindMap.md',          title: 'PSP — MindMap',          num: '✎' }
+      ]
+    }
+  ];
+
+  // Flat lookup for path → item + section
+  var PATH_INDEX = {};
+  SECTIONS.forEach(function (sec) {
+    sec.items.forEach(function (it) { PATH_INDEX[it.path] = { item: it, section: sec }; });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  // DOM
+  // ═══════════════════════════════════════════════════════════════
+  var nav = document.getElementById('nav');
+  var content = document.getElementById('content');
+  var breadcrumb = document.getElementById('breadcrumb');
+  var sidebar = document.getElementById('sidebar');
+  var backdrop = document.getElementById('backdrop');
+  var menuToggle = document.getElementById('menuToggle');
+  var feedbackBtn = document.getElementById('feedbackBtn');
+
+  // ═══════════════════════════════════════════════════════════════
+  // NAV RENDER
+  // ═══════════════════════════════════════════════════════════════
+  function renderNav() {
+    var html = '';
+    SECTIONS.forEach(function (sec) {
+      html += '<div class="nav-section ' + (sec.open ? 'open' : '') + '" data-section="' + sec.id + '">';
+      html += '<div class="nav-section-header">';
+      html += '<span class="nav-chevron">▶</span>';
+      html += '<span class="nav-section-label">' + escHtml(sec.label) + '</span>';
+      html += '<span class="nav-section-count">' + sec.items.length + '</span>';
+      html += '</div>';
+      html += '<div class="nav-items">';
+      sec.items.forEach(function (it) {
+        html += '<a class="nav-item" data-path="' + escAttr(it.path) + '" href="#' + escAttr(it.path) + '">';
+        html += '<span class="nav-item-num">' + escHtml(it.num) + '</span>';
+        html += escHtml(it.title);
+        html += '</a>';
+      });
+      html += '</div></div>';
+    });
+    nav.innerHTML = html;
+
+    // Section toggle
+    nav.querySelectorAll('.nav-section-header').forEach(function (h) {
+      h.addEventListener('click', function () {
+        h.parentElement.classList.toggle('open');
+      });
+    });
+
+    // Item click — close mobile sidebar after selection
+    nav.querySelectorAll('.nav-item').forEach(function (a) {
+      a.addEventListener('click', function () {
+        if (window.innerWidth <= 900) closeSidebar();
+      });
+    });
+  }
+
+  function markActive(path) {
+    nav.querySelectorAll('.nav-item').forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('data-path') === path);
+    });
+    // Open the section containing the active item
+    var entry = PATH_INDEX[path];
+    if (entry) {
+      var secEl = nav.querySelector('[data-section="' + entry.section.id + '"]');
+      if (secEl) secEl.classList.add('open');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // MARKDOWN LOADER
+  // ═══════════════════════════════════════════════════════════════
+  function loadDoc(path) {
+    var entry = PATH_INDEX[path];
+    if (!entry) { renderWelcome(); return; }
+
+    markActive(path);
+    renderBreadcrumb(entry);
+    content.innerHTML = '<div class="loading">Loading&hellip;</div>';
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    fetch(path)
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+        return res.text();
+      })
+      .then(function (text) {
+        var html  = '<article class="prose">' + marked.parse(text) + '</article>';
+        html += renderFeedback(entry);
+        content.innerHTML = html;
+        wireFeedback(path, entry.item.title);
+      })
+      .catch(function (err) {
+        content.innerHTML =
+          '<div class="error">' +
+          '<p>Could not load <code>' + escHtml(path) + '</code>.</p>' +
+          '<p style="margin-top:0.75rem;font-size:0.82rem;">' + escHtml(String(err.message || err)) + '</p>' +
+          '<p style="margin-top:0.75rem;font-size:0.82rem;">If you opened this file directly (<code>file://</code>), try serving the folder with a local server — e.g. <code>python3 -m http.server</code> in the project directory.</p>' +
+          '</div>';
+      });
+  }
+
+  function renderBreadcrumb(entry) {
+    var sec = entry.section.label;
+    var title = entry.item.title;
+    breadcrumb.innerHTML =
+      escHtml(sec) + ' <span class="sep">/</span> <span class="current">' + escHtml(title) + '</span>';
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // FEEDBACK
+  // ═══════════════════════════════════════════════════════════════
+  function voteKey(path, dir) { return 'forge-reader-vote:' + dir + ':' + path; }
+
+  function hasVoted(path, dir) {
+    try { return !!localStorage.getItem(voteKey(path, dir)); } catch (e) { return false; }
+  }
+
+  function recordVote(path, dir) {
+    try { localStorage.setItem(voteKey(path, dir), String(Date.now())); } catch (e) {}
+  }
+
+  function mailtoFor(subject, body) {
+    return 'mailto:' + FEEDBACK_EMAIL +
+      '?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(body);
+  }
+
+  function renderFeedback(entry) {
+    var title = entry.item.title;
+    var section = entry.section.label;
+    var upVoted = hasVoted(entry.item.path, 'up');
+    var downVoted = hasVoted(entry.item.path, 'down');
+    return '' +
+      '<section class="feedback">' +
+        '<div class="feedback-prompt">Was this section useful?</div>' +
+        '<div class="feedback-buttons">' +
+          '<a class="vote-btn up ' + (upVoted ? 'voted' : '') + '" data-dir="up" href="#">' +
+            '<span>👍</span><span class="vote-btn-label">' + (upVoted ? 'Thanks!' : 'Yes') + '</span>' +
+          '</a>' +
+          '<a class="vote-btn down ' + (downVoted ? 'voted' : '') + '" data-dir="down" href="#">' +
+            '<span>👎</span><span class="vote-btn-label">' + (downVoted ? 'Noted' : 'Needs work') + '</span>' +
+          '</a>' +
+        '</div>' +
+        '<div class="feedback-detail">' +
+          'Have more to say? ' +
+          '<a class="detail-link" href="#">Send detailed feedback on "' + escHtml(title) + '"</a>' +
+        '</div>' +
+      '</section>';
+  }
+
+  function wireFeedback(path, title) {
+    var entry = PATH_INDEX[path];
+    var section = entry ? entry.section.label : '';
+
+    content.querySelectorAll('.vote-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var dir = btn.getAttribute('data-dir');
+        if (btn.classList.contains('voted')) return; // already voted
+        recordVote(path, dir);
+        btn.classList.add('voted');
+        btn.querySelector('.vote-btn-label').textContent = (dir === 'up' ? 'Thanks!' : 'Noted');
+
+        var emoji = dir === 'up' ? '👍' : '👎';
+        var subject = FEEDBACK_SUBJECT + ' — ' + emoji + ' on "' + title + '"';
+        var body =
+          'Section: ' + section + '\n' +
+          'Document: ' + title + '\n' +
+          'Path: ' + path + '\n' +
+          'Vote: ' + emoji + ' ' + (dir === 'up' ? 'useful' : 'needs work') + '\n\n' +
+          '(Optional — add a note about why:)\n';
+        window.location.href = mailtoFor(subject, body);
+      });
+    });
+
+    var detail = content.querySelector('.detail-link');
+    if (detail) {
+      detail.addEventListener('click', function (e) {
+        e.preventDefault();
+        var subject = FEEDBACK_SUBJECT + ' — Feedback on "' + title + '"';
+        var body =
+          'Section: ' + section + '\n' +
+          'Document: ' + title + '\n' +
+          'Path: ' + path + '\n\n' +
+          '(Your thoughts below:)\n';
+        window.location.href = mailtoFor(subject, body);
+      });
+    }
+  }
+
+  feedbackBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    var path = currentPath();
+    var ctx = '';
+    if (path && PATH_INDEX[path]) {
+      var entry = PATH_INDEX[path];
+      ctx = 'While reading: ' + entry.item.title + ' (' + path + ')\n\n';
+    }
+    var body = ctx + '(Your thoughts on the Forge Framework:)\n';
+    window.location.href = mailtoFor(FEEDBACK_SUBJECT + ' — General Feedback', body);
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  // WELCOME
+  // ═══════════════════════════════════════════════════════════════
+  function renderWelcome() {
+    breadcrumb.innerHTML = 'The Forge Framework';
+    var suggestions = [
+      { path: 'README.md',                      title: 'Start with the README',   desc: 'Project overview — what Forge is and how the docs are organized.' },
+      { path: 'docs/00-overview.md',            title: 'The Overview',            desc: 'Entry point to the master reference.' },
+      { path: 'docs/00a-philosophy.md',         title: 'Philosophy',              desc: 'The ideas behind the framework.' },
+      { path: 'docs/01-forge-cycle.md',         title: 'The FORGE Cycle',         desc: 'Feed → Organize → React → Generate → Express.' },
+      { path: 'docs/08-getting-started.md',     title: 'Getting Started',         desc: 'How to apply the framework in practice.' },
+      { path: 'guide/forge-framework-guide-draft-v1.md', title: 'Guide Draft',    desc: 'The work-in-progress published guide.' }
+    ];
+    var cards = suggestions.map(function (s) {
+      return '' +
+        '<a class="suggest-card" href="#' + escAttr(s.path) + '">' +
+          '<div class="suggest-card-title">' + escHtml(s.title) + '</div>' +
+          '<div class="suggest-card-desc">' + escHtml(s.desc) + '</div>' +
+        '</a>';
+    }).join('');
+
+    content.innerHTML = '' +
+      '<section class="welcome">' +
+        '<h1>The Forge Framework</h1>' +
+        '<div class="tagline">A theory of organizational management for individuals and organizations.</div>' +
+        '<p style="color:var(--text-muted);font-size:0.95rem;">Pick a section on the left, or start with one of these:</p>' +
+        '<div class="welcome-suggest">' + cards + '</div>' +
+        '<p style="color:var(--text-dim);font-size:0.8rem;margin-top:2rem;font-family:var(--font-mono);">' +
+          'Feedback welcome — use the 👍 / 👎 on any section, or the ✉ button up top.' +
+        '</p>' +
+      '</section>';
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ROUTING — hash-based deep links
+  // ═══════════════════════════════════════════════════════════════
+  function currentPath() {
+    var h = window.location.hash.replace(/^#/, '');
+    return h && PATH_INDEX[h] ? h : null;
+  }
+
+  function route() {
+    var path = currentPath();
+    if (path) loadDoc(path);
+    else {
+      nav.querySelectorAll('.nav-item').forEach(function (a) { a.classList.remove('active'); });
+      renderWelcome();
+    }
+  }
+
+  window.addEventListener('hashchange', route);
+
+  // ═══════════════════════════════════════════════════════════════
+  // MOBILE SIDEBAR
+  // ═══════════════════════════════════════════════════════════════
+  function openSidebar() { sidebar.classList.add('open'); backdrop.classList.add('open'); }
+  function closeSidebar() { sidebar.classList.remove('open'); backdrop.classList.remove('open'); }
+  menuToggle.addEventListener('click', openSidebar);
+  backdrop.addEventListener('click', closeSidebar);
+
+  // ═══════════════════════════════════════════════════════════════
+  // HELPERS
+  // ═══════════════════════════════════════════════════════════════
+  function escHtml(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c];
+    });
+  }
+  function escAttr(s) { return escHtml(s).replace(/'/g, '&#39;'); }
+
+  // ═══════════════════════════════════════════════════════════════
+  // BOOT
+  // ═══════════════════════════════════════════════════════════════
+  if (window.marked && marked.setOptions) {
+    marked.setOptions({ gfm: true, breaks: false, headerIds: true, mangle: false });
+  }
+  renderNav();
+  route();
+})();
+</script>
+
+</body>
+</html>
