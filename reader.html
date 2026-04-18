@@ -3,78 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Forge Framework — Reader</title>
+<title>The Forge Framework — Guide Draft</title>
+<meta name="description" content="A theory of deliberate organization for individuals and organizations. By Joshua Keyes.">
 
-<!-- ═══════════════════════════════════════════════════════════════
-     FORGE FRAMEWORK — READER
-     Shareable static reader for docs/, guide/, evidence/, and
-     source-documents/. Feedback via mailto (zero backend).
-     Works on file:// and GitHub Pages.
-     ═══════════════════════════════════════════════════════════════ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <style>
+/* ============================================================
+   Design tokens — matched to RaihnForge portfolio
+   ============================================================ */
 :root {
-  --bg-deep:       #0f0d0b;
-  --bg-surface:    #1c1814;
-  --bg-raised:     #261f18;
-  --bg-hover:      #332a20;
-  --bg-inset:      #120f0c;
-  --bg-prose:      #1a1612;
+  --bg: #FAFBFE;
+  --bg-surface: #FFFFFF;
+  --bg-hover: #F0F2F8;
+  --bg-warm: #FEF7F0;
+  --border: #E4E7EE;
+  --border-strong: #C8CDD8;
+  --text: #1B2333;
+  --text-muted: #5A6578;
+  --text-light: #8891A2;
+  --accent: #D4722A;
+  --accent-hover: #BF6020;
+  --accent-subtle: rgba(212, 114, 42, 0.07);
+  --accent-2: #3B7DD8;
+  --tag-bg: #EEF1F8;
+  --tag-text: #5A6578;
+  --success: #2BA360;
+  --danger: #B54B4B;
 
-  --accent:        #e8761a;
-  --accent-glow:   #f5a623;
-  --accent-dim:    #a85a12;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Source Serif 4', 'Georgia', serif;
 
-  --green:         #4a7c59;
-  --red:           #a04040;
+  --reading-width: 680px;
+  --sidebar-w: 300px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 1px 3px rgba(27, 35, 51, 0.05), 0 1px 2px rgba(27, 35, 51, 0.03);
+  --shadow-md: 0 4px 16px rgba(27, 35, 51, 0.07), 0 2px 4px rgba(27, 35, 51, 0.04);
+  --shadow-hover: 0 12px 32px rgba(27, 35, 51, 0.1), 0 4px 8px rgba(27, 35, 51, 0.05);
+  --transition: 0.2s ease;
+}
 
-  --text:          #e8ddd0;
-  --text-muted:    #9a8b7a;
-  --text-dim:      #6b5e52;
-
-  --border:        #2e261e;
-  --border-light:  #3d3228;
-
-  --font-body:     Georgia, 'Times New Roman', serif;
-  --font-mono:     'Courier New', Courier, monospace;
-
-  --radius:        6px;
-  --radius-lg:     10px;
-  --transition:    0.2s ease;
-
-  --sidebar-w:     320px;
-  --prose-max:     760px;
+[data-theme="dark"] {
+  --bg: #0F1118;
+  --bg-surface: #181B24;
+  --bg-hover: #1F2330;
+  --bg-warm: #1E1814;
+  --border: #282D3A;
+  --border-strong: #3A4052;
+  --text: #E8EAF0;
+  --text-muted: #9BA2B2;
+  --text-light: #6B7388;
+  --accent: #E8863E;
+  --accent-hover: #F29650;
+  --accent-subtle: rgba(232, 134, 62, 0.1);
+  --accent-2: #5A9AEA;
+  --tag-bg: #1F2330;
+  --tag-text: #9BA2B2;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+html { font-size: 16px; scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
 
 body {
-  font-family: var(--font-body);
-  background: var(--bg-deep);
+  background: var(--bg);
   color: var(--text);
+  font-family: var(--font-body);
   line-height: 1.7;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-a { color: var(--accent-glow); text-decoration: none; }
-a:hover { color: var(--accent); text-decoration: underline; }
+a { color: var(--accent); text-decoration: none; transition: color var(--transition); }
+a:hover { color: var(--accent-hover); }
 
-/* ─────────────────────────────────────────────
-   SHELL LAYOUT
-   ───────────────────────────────────────────── */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ============================================================
+   Shell
+   ============================================================ */
 .shell {
   display: grid;
   grid-template-columns: var(--sidebar-w) 1fr;
   min-height: 100vh;
 }
 
-/* ─────────────────────────────────────────────
-   SIDEBAR
-   ───────────────────────────────────────────── */
+/* ============================================================
+   Sidebar
+   ============================================================ */
 .sidebar {
   background: var(--bg-surface);
   border-right: 1px solid var(--border);
@@ -82,145 +111,119 @@ a:hover { color: var(--accent); text-decoration: underline; }
   position: sticky;
   top: 0;
   overflow-y: auto;
-  padding: 1.25rem 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-light) var(--bg-surface);
+  padding: 1.75rem 0;
 }
 
 .sidebar::-webkit-scrollbar { width: 8px; }
-.sidebar::-webkit-scrollbar-track { background: var(--bg-surface); }
-.sidebar::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
 
 .brand {
-  padding: 0 1.5rem 1rem;
+  padding: 0 1.75rem 1.25rem;
   border-bottom: 1px solid var(--border);
   margin-bottom: 1rem;
 }
 
 .brand-title {
-  font-family: var(--font-mono);
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--accent);
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
 }
 
 .brand-subtitle {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
-  font-style: italic;
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
+  line-height: 1.45;
 }
 
 .brand-author {
-  font-size: 0.72rem;
-  color: var(--text-dim);
-  margin-top: 0.5rem;
-  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-top: 0.6rem;
+  font-weight: 500;
 }
 
-.nav-section {
-  margin-bottom: 0.5rem;
-}
+.nav-group { padding: 0 0.75rem; margin-bottom: 0.25rem; }
 
-.nav-section-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 1.5rem;
-  cursor: pointer;
-  user-select: none;
-  transition: background var(--transition);
-}
-
-.nav-section-header:hover { background: var(--bg-raised); }
-
-.nav-chevron {
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  transition: transform var(--transition);
-  flex-shrink: 0;
-  width: 8px;
-}
-
-.nav-section.open .nav-chevron { transform: rotate(90deg); }
-
-.nav-section-label {
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--text-muted);
+.nav-group-label {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-light);
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 0.08em;
+  padding: 0.85rem 1rem 0.5rem;
 }
 
-.nav-section-count {
-  margin-left: auto;
-  font-size: 0.68rem;
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-}
-
-.nav-items {
-  display: none;
-  padding: 0.25rem 0;
-}
-
-.nav-section.open .nav-items { display: block; }
-
-.nav-item {
+.nav-link {
   display: block;
-  padding: 0.4rem 1.5rem 0.4rem 2.5rem;
-  font-size: 0.85rem;
-  color: var(--text);
+  padding: 0.48rem 1rem;
+  margin: 0.08rem 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  border-left: 2px solid transparent;
   transition: all var(--transition);
   line-height: 1.4;
+  font-weight: 500;
 }
 
-.nav-item:hover {
-  background: var(--bg-raised);
-  color: var(--accent-glow);
+.nav-link:hover {
+  background: var(--bg-hover);
+  color: var(--text);
   text-decoration: none;
 }
 
-.nav-item.active {
-  background: var(--bg-raised);
-  border-left-color: var(--accent);
-  color: var(--accent-glow);
+.nav-link.active {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-weight: 600;
 }
 
-.nav-item-num {
-  display: inline-block;
-  font-family: var(--font-mono);
+.nav-link.nav-chapter {
+  padding-left: 1.75rem;
+  font-size: 0.86rem;
+  color: var(--text-light);
+}
+
+.nav-link.nav-chapter:hover { color: var(--text-muted); }
+
+.nav-link.nav-chapter.active { color: var(--accent); }
+
+.nav-part {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.nav-part .nav-part-num {
   font-size: 0.72rem;
-  color: var(--text-dim);
-  margin-right: 0.5rem;
-  min-width: 1.6rem;
+  font-weight: 600;
+  color: var(--text-light);
+  letter-spacing: 0.06em;
+  display: block;
+  text-transform: uppercase;
+  margin-bottom: 0.1rem;
 }
 
-.nav-item.active .nav-item-num { color: var(--accent); }
-
-/* ─────────────────────────────────────────────
-   MAIN CONTENT
-   ───────────────────────────────────────────── */
-.main {
-  padding: 0 2.5rem 4rem;
-  max-width: 100%;
-  overflow-x: hidden;
-}
+/* ============================================================
+   Main
+   ============================================================ */
+.main { padding: 0 3rem 5rem; }
 
 .topbar {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--bg-deep);
-  padding: 1.25rem 0;
-  margin: 0 -2.5rem 1.5rem;
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter: blur(12px);
+  margin: 0 -3rem 2rem;
+  padding: 1rem 3rem;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -230,127 +233,163 @@ a:hover { color: var(--accent); text-decoration: underline; }
 
 .breadcrumb {
   flex: 1;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   min-width: 0;
+  font-weight: 500;
 }
 
-.breadcrumb .sep { color: var(--text-dim); margin: 0 0.35rem; }
-.breadcrumb .current { color: var(--accent); }
+.breadcrumb .sep { color: var(--text-light); margin: 0 0.45rem; }
+.breadcrumb .current { color: var(--text); font-weight: 600; }
 
-.topbar-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.topbar-actions { display: flex; gap: 0.55rem; align-items: center; }
 
 .btn {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.5px;
-  padding: 0.45rem 0.85rem;
-  background: var(--bg-raised);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.5rem 0.95rem;
+  background: var(--bg-surface);
   color: var(--text);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-radius: 100px;
   cursor: pointer;
   transition: all var(--transition);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .btn:hover {
   background: var(--bg-hover);
-  border-color: var(--accent-dim);
-  color: var(--accent-glow);
+  border-color: var(--border-strong);
+  color: var(--text);
   text-decoration: none;
 }
 
 .btn-primary {
-  background: var(--accent-dim);
+  background: var(--accent);
+  color: #fff;
   border-color: var(--accent);
-  color: var(--text);
+  font-weight: 600;
 }
 
 .btn-primary:hover {
-  background: var(--accent);
-  color: var(--bg-deep);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 114, 42, 0.25);
 }
 
-/* ─────────────────────────────────────────────
-   PROSE
-   ───────────────────────────────────────────── */
+.btn-icon {
+  padding: 0.5rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  justify-content: center;
+}
+
+.btn-icon svg { width: 1rem; height: 1rem; }
+
+.theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+
+/* ============================================================
+   Prose
+   ============================================================ */
 .prose {
-  max-width: var(--prose-max);
+  max-width: var(--reading-width);
   margin: 0 auto;
-  padding: 1rem 0 2rem;
-  font-size: 1.02rem;
+  padding: 1.25rem 0 2rem;
+  font-size: 1.05rem;
+  line-height: 1.75;
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-  font-family: var(--font-mono);
-  color: var(--accent);
-  margin: 2.2rem 0 0.8rem;
-  line-height: 1.3;
-  letter-spacing: 0.3px;
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  font-family: var(--font-display);
+  color: var(--text);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 5rem;
 }
 
 .prose h1 {
-  font-size: 2rem;
-  border-bottom: 2px solid var(--accent-dim);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 700;
+  margin: 2.5rem 0 1rem;
   padding-bottom: 0.5rem;
+}
+
+.prose > h1:first-child {
   margin-top: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
 }
 
 .prose h2 {
-  font-size: 1.45rem;
-  color: var(--accent-glow);
-  border-bottom: 1px solid var(--border-light);
-  padding-bottom: 0.35rem;
+  font-size: clamp(1.45rem, 2.5vw, 1.85rem);
+  font-weight: 600;
+  margin: 2.5rem 0 0.85rem;
+  color: var(--accent);
 }
 
-.prose h3 { font-size: 1.18rem; color: var(--text); }
-.prose h4 { font-size: 1.02rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.prose h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 1.75rem 0 0.6rem;
+}
 
-.prose p { margin: 0.9rem 0; }
+.prose h4 {
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.4rem;
+  color: var(--text-muted);
+}
 
-.prose strong { color: var(--accent-glow); font-weight: 700; }
-.prose em { color: var(--text); }
+.prose p { margin: 0.95rem 0; }
 
-.prose ul, .prose ol { margin: 0.9rem 0 0.9rem 1.5rem; }
-.prose li { margin: 0.35rem 0; }
-.prose li > ul, .prose li > ol { margin-top: 0.25rem; margin-bottom: 0.25rem; }
+.prose strong { color: var(--text); font-weight: 600; }
+.prose em { color: var(--text); font-style: italic; }
+
+.prose ul, .prose ol { margin: 1rem 0 1rem 1.5rem; }
+.prose li { margin: 0.4rem 0; }
+.prose li > ul, .prose li > ol { margin-top: 0.3rem; margin-bottom: 0.3rem; }
 
 .prose blockquote {
-  margin: 1rem 0;
-  padding: 0.6rem 1.1rem;
-  border-left: 3px solid var(--accent-dim);
-  background: var(--bg-prose);
+  margin: 1.3rem 0;
+  padding: 0.35rem 1.25rem;
+  border-left: 3px solid var(--accent);
   color: var(--text-muted);
   font-style: italic;
-  border-radius: 0 var(--radius) var(--radius) 0;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
 }
 
-.prose blockquote p { margin: 0.4rem 0; }
+.prose blockquote p { margin: 0.5rem 0; }
 
 .prose code {
-  font-family: var(--font-mono);
-  font-size: 0.88em;
-  background: var(--bg-inset);
-  color: var(--accent-glow);
-  padding: 0.1rem 0.4rem;
-  border-radius: 3px;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: var(--bg-warm);
+  color: var(--accent-hover);
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
   border: 1px solid var(--border);
 }
 
 .prose pre {
-  background: var(--bg-inset);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem;
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.1rem;
   overflow-x: auto;
-  margin: 1rem 0;
-  font-size: 0.88rem;
-  line-height: 1.5;
+  margin: 1.25rem 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  box-shadow: var(--shadow-sm);
 }
 
 .prose pre code {
@@ -358,150 +397,78 @@ a:hover { color: var(--accent); text-decoration: underline; }
   border: none;
   padding: 0;
   color: var(--text);
-  font-size: inherit;
 }
 
 .prose table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1.25rem 0;
-  font-size: 0.92rem;
-  background: var(--bg-prose);
-  border-radius: var(--radius);
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .prose th {
-  background: var(--bg-raised);
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
+  background: var(--bg-hover);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 0.6rem 0.85rem;
+  letter-spacing: 0.04em;
+  padding: 0.7rem 0.95rem;
   text-align: left;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border);
 }
 
 .prose td {
-  padding: 0.55rem 0.85rem;
+  padding: 0.65rem 0.95rem;
   border-bottom: 1px solid var(--border);
   vertical-align: top;
 }
 
 .prose tr:last-child td { border-bottom: none; }
-.prose tr:hover td { background: var(--bg-hover); }
 
 .prose hr {
   border: none;
-  border-top: 1px solid var(--border-light);
-  margin: 2rem 0;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
 }
 
-.prose img { max-width: 100%; border-radius: var(--radius); }
+.prose img { max-width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
 
-.prose a { color: var(--accent-glow); border-bottom: 1px dotted var(--accent-dim); }
-.prose a:hover { border-bottom-style: solid; text-decoration: none; }
-
-/* ─────────────────────────────────────────────
-   STATES
-   ───────────────────────────────────────────── */
-.welcome {
-  max-width: var(--prose-max);
-  margin: 2rem auto;
-  padding: 2.5rem 2rem;
+/* ============================================================
+   Feedback block (injected after each chapter)
+   ============================================================ */
+.feedback {
+  max-width: var(--reading-width);
+  margin: 3rem auto 0;
+  padding: 1.75rem;
   background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  text-align: center;
-}
-
-.welcome h1 {
-  font-family: var(--font-mono);
-  color: var(--accent);
-  font-size: 1.9rem;
-  margin-bottom: 0.5rem;
-  letter-spacing: 1px;
-}
-
-.welcome .tagline {
-  color: var(--text-muted);
-  font-style: italic;
-  font-size: 1.05rem;
-  margin-bottom: 1.5rem;
-}
-
-.welcome-suggest {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.75rem;
-  margin-top: 2rem;
-  text-align: left;
-}
-
-.suggest-card {
-  background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1rem;
-  cursor: pointer;
-  transition: all var(--transition);
-  text-decoration: none;
-  color: var(--text);
-  display: block;
-}
-
-.suggest-card:hover {
-  background: var(--bg-hover);
-  border-color: var(--accent-dim);
-  transform: translateY(-2px);
-  text-decoration: none;
-}
-
-.suggest-card-title {
-  font-family: var(--font-mono);
-  color: var(--accent-glow);
-  font-size: 0.88rem;
-  font-weight: 700;
-  margin-bottom: 0.35rem;
-}
-
-.suggest-card-desc {
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  line-height: 1.4;
-}
-
-.loading, .error {
   text-align: center;
-  padding: 3rem 1rem;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
-.error { color: var(--red); }
-
-/* ─────────────────────────────────────────────
-   FEEDBACK FOOTER
-   ───────────────────────────────────────────── */
-.feedback {
-  max-width: var(--prose-max);
-  margin: 2.5rem auto 0;
-  padding: 1.5rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  text-align: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .feedback-prompt {
-  font-family: var(--font-mono);
   font-size: 0.78rem;
+  font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-bottom: 0.9rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.25rem;
+}
+
+.feedback-chapter {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 1.1rem;
+  font-weight: 600;
 }
 
 .feedback-buttons {
@@ -513,76 +480,87 @@ a:hover { color: var(--accent); text-decoration: underline; }
 
 .vote-btn {
   font-family: var(--font-body);
-  font-size: 1.1rem;
-  padding: 0.55rem 1.2rem;
-  background: var(--bg-raised);
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.55rem 1.15rem;
+  background: var(--bg);
   color: var(--text);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  border-radius: 100px;
   cursor: pointer;
   transition: all var(--transition);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .vote-btn:hover {
-  background: var(--bg-hover);
+  background: var(--bg-surface);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
   text-decoration: none;
 }
 
-.vote-btn.up:hover { border-color: var(--green); color: var(--green); }
-.vote-btn.down:hover { border-color: var(--red); color: var(--red); }
+.vote-btn.up:hover { border-color: var(--success); color: var(--success); }
+.vote-btn.down:hover { border-color: var(--danger); color: var(--danger); }
 
-.vote-btn.voted {
-  background: var(--bg-hover);
-  cursor: default;
-}
+.vote-btn.voted { cursor: default; }
+.vote-btn.voted.up   { background: rgba(43, 163, 96, 0.08);  border-color: var(--success); color: var(--success); }
+.vote-btn.voted.down { background: rgba(181, 75, 75, 0.08);  border-color: var(--danger);  color: var(--danger);  }
 
-.vote-btn.voted.up { border-color: var(--green); color: var(--green); }
-.vote-btn.voted.down { border-color: var(--red); color: var(--red); }
+.feedback-detail { margin-top: 0.9rem; font-size: 0.82rem; color: var(--text-muted); }
+.feedback-detail a { color: var(--text-muted); border-bottom: 1px dotted var(--text-light); }
+.feedback-detail a:hover { color: var(--accent); border-color: var(--accent); }
 
-.vote-btn-label { font-size: 0.85rem; font-family: var(--font-mono); }
-
-.feedback-detail {
-  margin-top: 1rem;
-  font-size: 0.82rem;
-  color: var(--text-dim);
-}
-
-.feedback-detail a {
+/* ============================================================
+   States
+   ============================================================ */
+.loading, .error {
+  max-width: var(--reading-width);
+  margin: 3rem auto;
+  padding: 2rem;
+  text-align: center;
   color: var(--text-muted);
-  border-bottom: 1px dotted var(--text-dim);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
 }
 
-.feedback-detail a:hover { color: var(--accent-glow); border-color: var(--accent-dim); }
+.error { color: var(--danger); }
 
-/* ─────────────────────────────────────────────
-   MOBILE
-   ───────────────────────────────────────────── */
+/* Hide the opening title block (rendered inside sidebar instead) */
+.prose .suppressed { display: none; }
+
+/* ============================================================
+   Mobile
+   ============================================================ */
 .menu-toggle {
   display: none;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.85rem;
-  padding: 0.5rem 0.85rem;
-  background: var(--bg-raised);
+  font-weight: 500;
+  padding: 0.5rem 0.9rem;
+  background: var(--bg-surface);
   color: var(--text);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-radius: 100px;
   cursor: pointer;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .sidebar-backdrop {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(15, 17, 24, 0.5);
   z-index: 20;
+  backdrop-filter: blur(2px);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .shell { grid-template-columns: 1fr; }
 
   .sidebar {
@@ -590,23 +568,22 @@ a:hover { color: var(--accent); text-decoration: underline; }
     top: 0;
     left: 0;
     z-index: 30;
-    width: 85%;
+    width: 88%;
     max-width: 340px;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--shadow-hover);
   }
 
   .sidebar.open { transform: translateX(0); }
   .sidebar-backdrop.open { display: block; }
 
-  .menu-toggle { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .menu-toggle { display: inline-flex; }
 
   .main { padding: 0 1.25rem 3rem; }
-  .topbar { margin: 0 -1.25rem 1.25rem; padding-left: 1.25rem; padding-right: 1.25rem; }
-  .prose { font-size: 0.98rem; }
-  .prose h1 { font-size: 1.6rem; }
-  .prose h2 { font-size: 1.25rem; }
+  .topbar { margin: 0 -1.25rem 1.5rem; padding: 0.85rem 1.25rem; }
+  .prose { font-size: 1rem; padding-top: 0.5rem; }
+  .feedback { padding: 1.25rem; }
 }
 </style>
 </head>
@@ -620,7 +597,7 @@ a:hover { color: var(--accent); text-decoration: underline; }
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-title">The Forge Framework</div>
-      <div class="brand-subtitle">A theory of organizational management</div>
+      <div class="brand-subtitle">A Guide to Deliberate Organization for Individuals and Organizations</div>
       <div class="brand-author">by Joshua Keyes</div>
     </div>
     <nav id="nav"></nav>
@@ -629,10 +606,17 @@ a:hover { color: var(--accent); text-decoration: underline; }
   <!-- ═══ MAIN ═══ -->
   <main class="main">
     <div class="topbar">
-      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰ Menu</button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        Contents
+      </button>
       <div class="breadcrumb" id="breadcrumb">The Forge Framework</div>
       <div class="topbar-actions">
-        <a class="btn" id="feedbackBtn" href="#">✉ Send feedback</a>
+        <a class="btn btn-primary" id="feedbackBtn" href="#">Send feedback</a>
+        <button class="btn btn-icon theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
       </div>
     </div>
 
@@ -646,83 +630,11 @@ a:hover { color: var(--accent); text-decoration: underline; }
   'use strict';
 
   // ═══════════════════════════════════════════════════════════════
-  // CONFIG — nav structure. Paths relative to reader.html.
+  // CONFIG
   // ═══════════════════════════════════════════════════════════════
   var FEEDBACK_EMAIL = 'joshua.keyes@gmail.com';
   var FEEDBACK_SUBJECT = 'Forge Framework';
-
-  var SECTIONS = [
-    {
-      id: 'overview',
-      label: 'Start Here',
-      open: true,
-      items: [
-        { path: 'README.md',     title: 'README',       num: '✦' },
-        { path: 'DESIGN.md',     title: 'Design',       num: '✦' },
-        { path: 'ARCHITECTURE.md', title: 'Architecture', num: '✦' }
-      ]
-    },
-    {
-      id: 'docs',
-      label: 'Docs — Master Reference',
-      open: true,
-      items: [
-        { path: 'docs/00-overview.md',                title: 'Overview',                num: '00' },
-        { path: 'docs/00a-philosophy.md',             title: 'Philosophy',              num: '00a' },
-        { path: 'docs/00b-origin-story.md',           title: 'Origin Story',            num: '00b' },
-        { path: 'docs/00c-core-concepts.md',          title: 'Core Concepts',           num: '00c' },
-        { path: 'docs/01-forge-cycle.md',             title: 'The FORGE Cycle',         num: '01' },
-        { path: 'docs/02-organizational-structure.md',title: 'Organizational Structure',num: '02' },
-        { path: 'docs/03-functional-folders.md',      title: 'Functional Folders',      num: '03' },
-        { path: 'docs/04-project-management.md',      title: 'Project Management',      num: '04' },
-        { path: 'docs/05-controls-and-security.md',   title: 'Controls & Security',     num: '05' },
-        { path: 'docs/06-naming-conventions.md',      title: 'Naming Conventions',      num: '06' },
-        { path: 'docs/07-implementations.md',         title: 'Implementations',         num: '07' },
-        { path: 'docs/08-getting-started.md',         title: 'Getting Started',         num: '08' },
-        { path: 'docs/PROJECT-SUMMARY-PLAN.md',       title: 'Project Summary Plan',    num: '✦' }
-      ]
-    },
-    {
-      id: 'guide',
-      label: 'Guide — Published Draft',
-      open: false,
-      items: [
-        { path: 'guide/README.md',                         title: 'About the Guide',  num: '✦' },
-        { path: 'guide/forge-framework-guide-draft-v1.md', title: 'Guide Draft v1',   num: '✦' }
-      ]
-    },
-    {
-      id: 'evidence',
-      label: 'Evidence',
-      open: false,
-      items: [
-        { path: 'evidence/README.md', title: 'Evidence Index', num: '✦' }
-      ]
-    },
-    {
-      id: 'source',
-      label: 'Source Documents',
-      open: false,
-      items: [
-        { path: 'resources/source-documents/INDEX.md',                                 title: 'Source Index',           num: '✦' },
-        { path: 'resources/source-documents/4S-Index.md',                              title: '4S Index',               num: '4S' },
-        { path: 'resources/source-documents/4S-Security-MasterControl.md',             title: '4S Security Master',     num: '4S' },
-        { path: 'resources/source-documents/ForgeFramework-Presentation-4S.md',        title: 'Presentation — 4S',      num: '✦' },
-        { path: 'resources/source-documents/ForgeFramework-Presentation-Kelvin-Longhorn.md', title: 'Presentation — Kelvin/Longhorn', num: '✦' },
-        { path: 'resources/source-documents/Forge-Framework-Handwritten-Notes.md',     title: 'Handwritten Notes',      num: '✎' },
-        { path: 'resources/source-documents/Forge-Framework-Schedule.md',              title: 'Schedule',               num: '✎' },
-        { path: 'resources/source-documents/Notes-John-Josh-Sync.md',                  title: 'Notes — John/Josh Sync', num: '✎' },
-        { path: 'resources/source-documents/Project-Summary-Plan-Detail.md',           title: 'PSP — Detail',           num: '✎' },
-        { path: 'resources/source-documents/Project-Summary-Plan-MindMap.md',          title: 'PSP — MindMap',          num: '✎' }
-      ]
-    }
-  ];
-
-  // Flat lookup for path → item + section
-  var PATH_INDEX = {};
-  SECTIONS.forEach(function (sec) {
-    sec.items.forEach(function (it) { PATH_INDEX[it.path] = { item: it, section: sec }; });
-  });
+  var GUIDE_PATH = 'guide/forge-framework-guide-draft-v1.md';
 
   // ═══════════════════════════════════════════════════════════════
   // DOM
@@ -734,242 +646,321 @@ a:hover { color: var(--accent); text-decoration: underline; }
   var backdrop = document.getElementById('backdrop');
   var menuToggle = document.getElementById('menuToggle');
   var feedbackBtn = document.getElementById('feedbackBtn');
+  var themeToggle = document.getElementById('themeToggle');
 
   // ═══════════════════════════════════════════════════════════════
-  // NAV RENDER
+  // THEME
   // ═══════════════════════════════════════════════════════════════
-  function renderNav() {
-    var html = '';
-    SECTIONS.forEach(function (sec) {
-      html += '<div class="nav-section ' + (sec.open ? 'open' : '') + '" data-section="' + sec.id + '">';
-      html += '<div class="nav-section-header">';
-      html += '<span class="nav-chevron">▶</span>';
-      html += '<span class="nav-section-label">' + escHtml(sec.label) + '</span>';
-      html += '<span class="nav-section-count">' + sec.items.length + '</span>';
-      html += '</div>';
-      html += '<div class="nav-items">';
-      sec.items.forEach(function (it) {
-        html += '<a class="nav-item" data-path="' + escAttr(it.path) + '" href="#' + escAttr(it.path) + '">';
-        html += '<span class="nav-item-num">' + escHtml(it.num) + '</span>';
-        html += escHtml(it.title);
-        html += '</a>';
-      });
-      html += '</div></div>';
-    });
-    nav.innerHTML = html;
-
-    // Section toggle
-    nav.querySelectorAll('.nav-section-header').forEach(function (h) {
-      h.addEventListener('click', function () {
-        h.parentElement.classList.toggle('open');
-      });
-    });
-
-    // Item click — close mobile sidebar after selection
-    nav.querySelectorAll('.nav-item').forEach(function (a) {
-      a.addEventListener('click', function () {
-        if (window.innerWidth <= 900) closeSidebar();
-      });
-    });
+  function initTheme() {
+    var stored = null;
+    try { stored = localStorage.getItem('forge-reader-theme'); } catch (e) {}
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var theme = stored || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
   }
+  initTheme();
 
-  function markActive(path) {
-    nav.querySelectorAll('.nav-item').forEach(function (a) {
-      a.classList.toggle('active', a.getAttribute('data-path') === path);
-    });
-    // Open the section containing the active item
-    var entry = PATH_INDEX[path];
-    if (entry) {
-      var secEl = nav.querySelector('[data-section="' + entry.section.id + '"]');
-      if (secEl) secEl.classList.add('open');
-    }
-  }
+  themeToggle.addEventListener('click', function () {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('forge-reader-theme', next); } catch (e) {}
+  });
 
   // ═══════════════════════════════════════════════════════════════
-  // MARKDOWN LOADER
+  // LOAD + RENDER GUIDE
   // ═══════════════════════════════════════════════════════════════
-  function loadDoc(path) {
-    var entry = PATH_INDEX[path];
-    if (!entry) { renderWelcome(); return; }
+  var chapters = []; // { id, number, title, partTitle, partNum }
+  var currentChapterId = null;
 
-    markActive(path);
-    renderBreadcrumb(entry);
-    content.innerHTML = '<div class="loading">Loading&hellip;</div>';
-    window.scrollTo({ top: 0, behavior: 'instant' });
+  function loadGuide() {
+    content.innerHTML = '<div class="loading">Loading the Guide&hellip;</div>';
 
-    fetch(path)
+    fetch(GUIDE_PATH)
       .then(function (res) {
         if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
         return res.text();
       })
-      .then(function (text) {
-        var html  = '<article class="prose">' + marked.parse(text) + '</article>';
-        html += renderFeedback(entry);
-        content.innerHTML = html;
-        wireFeedback(path, entry.item.title);
+      .then(function (md) {
+        var html = marked.parse(md);
+        var wrapper = document.createElement('article');
+        wrapper.className = 'prose';
+        wrapper.innerHTML = html;
+
+        // Strip redundant opening title block — sidebar already has it
+        var firstH1 = wrapper.querySelector('h1');
+        if (firstH1) {
+          var next = firstH1.nextElementSibling;
+          firstH1.classList.add('suppressed');
+          // the subtitle line is an h3 right after — also suppress
+          if (next && next.tagName === 'H3' && next.textContent.indexOf('Guide to Deliberate') >= 0) {
+            next.classList.add('suppressed');
+          }
+        }
+
+        buildTOC(wrapper);
+        injectFeedback(wrapper);
+
+        content.innerHTML = '';
+        content.appendChild(wrapper);
+
+        observeChapters();
+        handleHashScroll();
       })
       .catch(function (err) {
         content.innerHTML =
           '<div class="error">' +
-          '<p>Could not load <code>' + escHtml(path) + '</code>.</p>' +
-          '<p style="margin-top:0.75rem;font-size:0.82rem;">' + escHtml(String(err.message || err)) + '</p>' +
-          '<p style="margin-top:0.75rem;font-size:0.82rem;">If you opened this file directly (<code>file://</code>), try serving the folder with a local server — e.g. <code>python3 -m http.server</code> in the project directory.</p>' +
+          '<p><strong>Could not load the Guide.</strong></p>' +
+          '<p style="margin-top:0.5rem;font-size:0.85rem;">' + escHtml(String(err.message || err)) + '</p>' +
+          '<p style="margin-top:0.75rem;font-size:0.85rem;">If you opened this file via <code>file://</code>, try serving it locally: <code>python3 -m http.server</code>.</p>' +
           '</div>';
       });
   }
 
-  function renderBreadcrumb(entry) {
-    var sec = entry.section.label;
-    var title = entry.item.title;
-    breadcrumb.innerHTML =
-      escHtml(sec) + ' <span class="sep">/</span> <span class="current">' + escHtml(title) + '</span>';
+  // ═══════════════════════════════════════════════════════════════
+  // TOC — parse H1 (Parts) and H2 (Chapters) to build sidebar
+  // ═══════════════════════════════════════════════════════════════
+  function buildTOC(root) {
+    chapters = [];
+    var parts = []; // { num, title, id, chapters: [] }
+    var currentPart = null;
+
+    var headings = root.querySelectorAll('h1, h2');
+    headings.forEach(function (h) {
+      if (!h.id) h.id = slug(h.textContent);
+      if (h.classList.contains('suppressed')) return;
+
+      if (h.tagName === 'H1') {
+        var partMatch = h.textContent.match(/^Part\s+([IVX]+):\s*(.+?)(?:\s+—.*)?$/);
+        if (partMatch) {
+          currentPart = { num: 'Part ' + partMatch[1], title: partMatch[2].trim(), id: h.id, chapters: [] };
+          parts.push(currentPart);
+        } else {
+          // e.g. "Closing"
+          currentPart = { num: '', title: h.textContent.trim(), id: h.id, chapters: [] };
+          parts.push(currentPart);
+        }
+      } else if (h.tagName === 'H2') {
+        var chMatch = h.textContent.match(/^Chapter\s+(\d+):\s*(.+)$/);
+        var ch = {
+          id: h.id,
+          number: chMatch ? chMatch[1] : '',
+          title: chMatch ? chMatch[2].trim() : h.textContent.trim(),
+          partTitle: currentPart ? currentPart.title : '',
+          partNum: currentPart ? currentPart.num : '',
+          el: h
+        };
+        chapters.push(ch);
+        if (currentPart) currentPart.chapters.push(ch);
+      }
+    });
+
+    renderNav(parts);
+  }
+
+  function renderNav(parts) {
+    var html = '';
+    html += '<div class="nav-group">';
+    html += '<div class="nav-group-label">Guide Contents</div>';
+
+    parts.forEach(function (p) {
+      html += '<a class="nav-link nav-part" href="#' + escAttr(p.id) + '" data-id="' + escAttr(p.id) + '">';
+      if (p.num) html += '<span class="nav-part-num">' + escHtml(p.num) + '</span>';
+      html += escHtml(p.title);
+      html += '</a>';
+      p.chapters.forEach(function (c) {
+        var label = c.number ? ('Ch. ' + c.number + ' — ' + c.title) : c.title;
+        html += '<a class="nav-link nav-chapter" href="#' + escAttr(c.id) + '" data-id="' + escAttr(c.id) + '">' + escHtml(label) + '</a>';
+      });
+    });
+
+    html += '</div>';
+    nav.innerHTML = html;
+
+    nav.querySelectorAll('.nav-link').forEach(function (a) {
+      a.addEventListener('click', function () {
+        if (window.innerWidth <= 960) closeSidebar();
+      });
+    });
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // FEEDBACK
+  // FEEDBACK — inject a block after each chapter
   // ═══════════════════════════════════════════════════════════════
-  function voteKey(path, dir) { return 'forge-reader-vote:' + dir + ':' + path; }
+  function injectFeedback(root) {
+    chapters.forEach(function (ch, idx) {
+      var end = findChapterEnd(root, ch.el);
+      var block = document.createElement('section');
+      block.className = 'feedback';
+      block.setAttribute('data-chapter-id', ch.id);
+      block.innerHTML = feedbackHTML(ch);
+      if (end) end.parentNode.insertBefore(block, end);
+      else root.appendChild(block);
+    });
 
-  function hasVoted(path, dir) {
-    try { return !!localStorage.getItem(voteKey(path, dir)); } catch (e) { return false; }
+    // Wire up vote buttons & detail links once rendered
+    setTimeout(function () {
+      document.querySelectorAll('.feedback').forEach(function (fb) {
+        var chId = fb.getAttribute('data-chapter-id');
+        var ch = chapterById(chId);
+        if (!ch) return;
+        fb.querySelectorAll('.vote-btn').forEach(function (btn) {
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (btn.classList.contains('voted')) return;
+            var dir = btn.getAttribute('data-dir');
+            recordVote(chId, dir);
+            btn.classList.add('voted');
+            var lbl = btn.querySelector('.vote-btn-label');
+            if (lbl) lbl.textContent = dir === 'up' ? 'Thanks!' : 'Noted';
+            window.location.href = voteMailto(ch, dir);
+          });
+        });
+        var detail = fb.querySelector('.detail-link');
+        if (detail) {
+          detail.addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.href = detailMailto(ch);
+          });
+        }
+      });
+    }, 0);
   }
 
-  function recordVote(path, dir) {
-    try { localStorage.setItem(voteKey(path, dir), String(Date.now())); } catch (e) {}
+  function findChapterEnd(root, startEl) {
+    var node = startEl.nextElementSibling;
+    while (node) {
+      if (node.tagName === 'H2' || node.tagName === 'H1') return node;
+      node = node.nextElementSibling;
+    }
+    return null;
   }
 
-  function mailtoFor(subject, body) {
+  function feedbackHTML(ch) {
+    var upVoted = hasVoted(ch.id, 'up');
+    var downVoted = hasVoted(ch.id, 'down');
+    var label = ch.number ? ('Chapter ' + ch.number + ' — ' + ch.title) : ch.title;
+    return '' +
+      '<div class="feedback-prompt">How did this land?</div>' +
+      '<div class="feedback-chapter">' + escHtml(label) + '</div>' +
+      '<div class="feedback-buttons">' +
+        '<a class="vote-btn up ' + (upVoted ? 'voted' : '') + '" data-dir="up" href="#">' +
+          '<span>👍</span><span class="vote-btn-label">' + (upVoted ? 'Thanks!' : 'Resonated') + '</span>' +
+        '</a>' +
+        '<a class="vote-btn down ' + (downVoted ? 'voted' : '') + '" data-dir="down" href="#">' +
+          '<span>👎</span><span class="vote-btn-label">' + (downVoted ? 'Noted' : 'Needs work') + '</span>' +
+        '</a>' +
+      '</div>' +
+      '<div class="feedback-detail">' +
+        'Something specific on your mind? ' +
+        '<a class="detail-link" href="#">Send a detailed note</a>' +
+      '</div>';
+  }
+
+  function voteKey(id, dir) { return 'forge-reader-vote:' + dir + ':' + id; }
+  function hasVoted(id, dir) { try { return !!localStorage.getItem(voteKey(id, dir)); } catch (e) { return false; } }
+  function recordVote(id, dir) { try { localStorage.setItem(voteKey(id, dir), String(Date.now())); } catch (e) {} }
+
+  function mailto(subject, body) {
     return 'mailto:' + FEEDBACK_EMAIL +
       '?subject=' + encodeURIComponent(subject) +
       '&body=' + encodeURIComponent(body);
   }
 
-  function renderFeedback(entry) {
-    var title = entry.item.title;
-    var section = entry.section.label;
-    var upVoted = hasVoted(entry.item.path, 'up');
-    var downVoted = hasVoted(entry.item.path, 'down');
-    return '' +
-      '<section class="feedback">' +
-        '<div class="feedback-prompt">Was this section useful?</div>' +
-        '<div class="feedback-buttons">' +
-          '<a class="vote-btn up ' + (upVoted ? 'voted' : '') + '" data-dir="up" href="#">' +
-            '<span>👍</span><span class="vote-btn-label">' + (upVoted ? 'Thanks!' : 'Yes') + '</span>' +
-          '</a>' +
-          '<a class="vote-btn down ' + (downVoted ? 'voted' : '') + '" data-dir="down" href="#">' +
-            '<span>👎</span><span class="vote-btn-label">' + (downVoted ? 'Noted' : 'Needs work') + '</span>' +
-          '</a>' +
-        '</div>' +
-        '<div class="feedback-detail">' +
-          'Have more to say? ' +
-          '<a class="detail-link" href="#">Send detailed feedback on "' + escHtml(title) + '"</a>' +
-        '</div>' +
-      '</section>';
+  function voteMailto(ch, dir) {
+    var emoji = dir === 'up' ? '👍' : '👎';
+    var label = ch.number ? ('Chapter ' + ch.number + ': ' + ch.title) : ch.title;
+    var subject = FEEDBACK_SUBJECT + ' — ' + emoji + ' on "' + label + '"';
+    var body =
+      'Part: ' + (ch.partNum ? ch.partNum + ' — ' + ch.partTitle : ch.partTitle) + '\n' +
+      'Chapter: ' + label + '\n' +
+      'Vote: ' + emoji + ' ' + (dir === 'up' ? 'resonated' : 'needs work') + '\n\n' +
+      '(Optional — a quick note on why:)\n';
+    return mailto(subject, body);
   }
 
-  function wireFeedback(path, title) {
-    var entry = PATH_INDEX[path];
-    var section = entry ? entry.section.label : '';
+  function detailMailto(ch) {
+    var label = ch.number ? ('Chapter ' + ch.number + ': ' + ch.title) : ch.title;
+    var subject = FEEDBACK_SUBJECT + ' — Feedback on "' + label + '"';
+    var body =
+      'Part: ' + (ch.partNum ? ch.partNum + ' — ' + ch.partTitle : ch.partTitle) + '\n' +
+      'Chapter: ' + label + '\n\n' +
+      '(Your thoughts below:)\n';
+    return mailto(subject, body);
+  }
 
-    content.querySelectorAll('.vote-btn').forEach(function (btn) {
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        var dir = btn.getAttribute('data-dir');
-        if (btn.classList.contains('voted')) return; // already voted
-        recordVote(path, dir);
-        btn.classList.add('voted');
-        btn.querySelector('.vote-btn-label').textContent = (dir === 'up' ? 'Thanks!' : 'Noted');
-
-        var emoji = dir === 'up' ? '👍' : '👎';
-        var subject = FEEDBACK_SUBJECT + ' — ' + emoji + ' on "' + title + '"';
-        var body =
-          'Section: ' + section + '\n' +
-          'Document: ' + title + '\n' +
-          'Path: ' + path + '\n' +
-          'Vote: ' + emoji + ' ' + (dir === 'up' ? 'useful' : 'needs work') + '\n\n' +
-          '(Optional — add a note about why:)\n';
-        window.location.href = mailtoFor(subject, body);
-      });
-    });
-
-    var detail = content.querySelector('.detail-link');
-    if (detail) {
-      detail.addEventListener('click', function (e) {
-        e.preventDefault();
-        var subject = FEEDBACK_SUBJECT + ' — Feedback on "' + title + '"';
-        var body =
-          'Section: ' + section + '\n' +
-          'Document: ' + title + '\n' +
-          'Path: ' + path + '\n\n' +
-          '(Your thoughts below:)\n';
-        window.location.href = mailtoFor(subject, body);
-      });
-    }
+  function chapterById(id) {
+    for (var i = 0; i < chapters.length; i++) if (chapters[i].id === id) return chapters[i];
+    return null;
   }
 
   feedbackBtn.addEventListener('click', function (e) {
     e.preventDefault();
-    var path = currentPath();
     var ctx = '';
-    if (path && PATH_INDEX[path]) {
-      var entry = PATH_INDEX[path];
-      ctx = 'While reading: ' + entry.item.title + ' (' + path + ')\n\n';
+    if (currentChapterId) {
+      var ch = chapterById(currentChapterId);
+      if (ch) {
+        var label = ch.number ? ('Chapter ' + ch.number + ': ' + ch.title) : ch.title;
+        ctx = 'While reading: ' + label + '\n\n';
+      }
     }
     var body = ctx + '(Your thoughts on the Forge Framework:)\n';
-    window.location.href = mailtoFor(FEEDBACK_SUBJECT + ' — General Feedback', body);
+    window.location.href = mailto(FEEDBACK_SUBJECT + ' — General Feedback', body);
   });
 
   // ═══════════════════════════════════════════════════════════════
-  // WELCOME
+  // SCROLL SPY — track current chapter, update breadcrumb + active nav
   // ═══════════════════════════════════════════════════════════════
-  function renderWelcome() {
-    breadcrumb.innerHTML = 'The Forge Framework';
-    var suggestions = [
-      { path: 'README.md',                      title: 'Start with the README',   desc: 'Project overview — what Forge is and how the docs are organized.' },
-      { path: 'docs/00-overview.md',            title: 'The Overview',            desc: 'Entry point to the master reference.' },
-      { path: 'docs/00a-philosophy.md',         title: 'Philosophy',              desc: 'The ideas behind the framework.' },
-      { path: 'docs/01-forge-cycle.md',         title: 'The FORGE Cycle',         desc: 'Feed → Organize → React → Generate → Express.' },
-      { path: 'docs/08-getting-started.md',     title: 'Getting Started',         desc: 'How to apply the framework in practice.' },
-      { path: 'guide/forge-framework-guide-draft-v1.md', title: 'Guide Draft',    desc: 'The work-in-progress published guide.' }
-    ];
-    var cards = suggestions.map(function (s) {
-      return '' +
-        '<a class="suggest-card" href="#' + escAttr(s.path) + '">' +
-          '<div class="suggest-card-title">' + escHtml(s.title) + '</div>' +
-          '<div class="suggest-card-desc">' + escHtml(s.desc) + '</div>' +
-        '</a>';
-    }).join('');
+  function observeChapters() {
+    if (!('IntersectionObserver' in window)) return;
 
-    content.innerHTML = '' +
-      '<section class="welcome">' +
-        '<h1>The Forge Framework</h1>' +
-        '<div class="tagline">A theory of organizational management for individuals and organizations.</div>' +
-        '<p style="color:var(--text-muted);font-size:0.95rem;">Pick a section on the left, or start with one of these:</p>' +
-        '<div class="welcome-suggest">' + cards + '</div>' +
-        '<p style="color:var(--text-dim);font-size:0.8rem;margin-top:2rem;font-family:var(--font-mono);">' +
-          'Feedback welcome — use the 👍 / 👎 on any section, or the ✉ button up top.' +
-        '</p>' +
-      '</section>';
+    var visible = new Set();
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) visible.add(entry.target.id);
+        else visible.delete(entry.target.id);
+      });
+
+      // Pick the topmost visible chapter
+      var topId = null;
+      for (var i = 0; i < chapters.length; i++) {
+        if (visible.has(chapters[i].id)) { topId = chapters[i].id; break; }
+      }
+      if (topId && topId !== currentChapterId) {
+        currentChapterId = topId;
+        updateActiveNav(topId);
+        updateBreadcrumb(topId);
+      }
+    }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+
+    chapters.forEach(function (ch) { observer.observe(ch.el); });
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // ROUTING — hash-based deep links
-  // ═══════════════════════════════════════════════════════════════
-  function currentPath() {
-    var h = window.location.hash.replace(/^#/, '');
-    return h && PATH_INDEX[h] ? h : null;
+  function updateActiveNav(id) {
+    nav.querySelectorAll('.nav-link').forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('data-id') === id);
+    });
   }
 
-  function route() {
-    var path = currentPath();
-    if (path) loadDoc(path);
-    else {
-      nav.querySelectorAll('.nav-item').forEach(function (a) { a.classList.remove('active'); });
-      renderWelcome();
-    }
+  function updateBreadcrumb(id) {
+    var ch = chapterById(id);
+    if (!ch) return;
+    var label = ch.number ? ('Chapter ' + ch.number + ' — ' + ch.title) : ch.title;
+    var parts = [];
+    if (ch.partNum) parts.push(escHtml(ch.partNum));
+    if (ch.partTitle) parts.push(escHtml(ch.partTitle));
+    var prefix = parts.length ? parts.join(' <span class="sep">·</span> ') + ' <span class="sep">/</span> ' : '';
+    breadcrumb.innerHTML = prefix + '<span class="current">' + escHtml(label) + '</span>';
   }
 
-  window.addEventListener('hashchange', route);
+  function handleHashScroll() {
+    var id = window.location.hash.replace(/^#/, '');
+    if (!id) return;
+    var el = document.getElementById(id);
+    if (el) setTimeout(function () { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+  }
+
+  window.addEventListener('hashchange', handleHashScroll);
 
   // ═══════════════════════════════════════════════════════════════
   // MOBILE SIDEBAR
@@ -989,14 +980,22 @@ a:hover { color: var(--accent); text-decoration: underline; }
   }
   function escAttr(s) { return escHtml(s).replace(/'/g, '&#39;'); }
 
+  function slug(s) {
+    return String(s).toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // BOOT
   // ═══════════════════════════════════════════════════════════════
   if (window.marked && marked.setOptions) {
-    marked.setOptions({ gfm: true, breaks: false, headerIds: true, mangle: false });
+    marked.setOptions({ gfm: true, breaks: false, mangle: false });
   }
-  renderNav();
-  route();
+
+  loadGuide();
 })();
 </script>
 
