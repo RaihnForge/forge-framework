@@ -441,6 +441,35 @@ a:hover { color: var(--accent-hover); }
 .prose img { max-width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
 
 /* ============================================================
+   Chapter banner (placeholder art, rotating motifs)
+   ============================================================ */
+.chapter-banner {
+  max-width: var(--reading-width);
+  margin: 2.25rem auto 0.25rem;
+  height: 140px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--bg-warm) 0%, var(--bg-surface) 100%);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--accent);
+  transition: border-color var(--transition);
+}
+
+[data-theme="dark"] .chapter-banner {
+  background: linear-gradient(135deg, var(--bg-warm) 0%, var(--bg-hover) 100%);
+}
+
+.chapter-banner svg { width: 100%; height: 100%; display: block; }
+.chapter-banner svg .muted { color: var(--border-strong); }
+
+@media (max-width: 960px) {
+  .chapter-banner { height: 110px; margin-top: 1.75rem; }
+}
+
+/* ============================================================
    Feedback block (injected after each chapter)
    ============================================================ */
 .feedback {
@@ -700,6 +729,7 @@ a:hover { color: var(--accent-hover); }
 
         buildTOC(wrapper);
         injectFeedback(wrapper);
+        injectBanners(wrapper);
 
         content.innerHTML = '';
         content.appendChild(wrapper);
@@ -781,6 +811,97 @@ a:hover { color: var(--accent-hover); }
       a.addEventListener('click', function () {
         if (window.innerWidth <= 960) closeSidebar();
       });
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // CHAPTER BANNERS — rotating placeholder SVG motifs
+  // ═══════════════════════════════════════════════════════════════
+  var BANNER_MOTIFS = [
+    // 0 — Strike & Sparks (forge anvil)
+    '<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+      '<line class="muted" x1="130" y1="112" x2="270" y2="112" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>' +
+      '<g stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none">' +
+        '<line x1="200" y1="102" x2="200" y2="28"/>' +
+        '<line x1="200" y1="102" x2="246" y2="40"/>' +
+        '<line x1="200" y1="102" x2="154" y2="40"/>' +
+        '<line x1="200" y1="102" x2="278" y2="66"/>' +
+        '<line x1="200" y1="102" x2="122" y2="66"/>' +
+        '<line x1="200" y1="102" x2="292" y2="94"/>' +
+        '<line x1="200" y1="102" x2="108" y2="94"/>' +
+      '</g>' +
+      '<circle cx="200" cy="102" r="5" fill="currentColor"/>' +
+    '</svg>',
+
+    // 1 — Concentric arcs (cycle)
+    '<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+      '<g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">' +
+        '<path d="M 110 118 A 90 90 0 0 1 290 118" opacity="0.35"/>' +
+        '<path d="M 140 118 A 60 60 0 0 1 260 118" opacity="0.65"/>' +
+        '<path d="M 170 118 A 30 30 0 0 1 230 118"/>' +
+      '</g>' +
+      '<circle cx="110" cy="118" r="4" fill="currentColor" opacity="0.35"/>' +
+      '<circle cx="140" cy="118" r="4" fill="currentColor" opacity="0.65"/>' +
+      '<circle cx="170" cy="118" r="4" fill="currentColor"/>' +
+    '</svg>',
+
+    // 2 — Five folders (domains / structure)
+    '<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+      '<g>' +
+        '<rect x="116" y="55" width="30" height="30" rx="5" fill="currentColor"/>' +
+        '<rect x="156" y="55" width="30" height="30" rx="5" fill="none" stroke="currentColor" stroke-width="2.5"/>' +
+        '<rect x="196" y="55" width="30" height="30" rx="5" fill="currentColor"/>' +
+        '<rect x="236" y="55" width="30" height="30" rx="5" fill="none" stroke="currentColor" stroke-width="2.5"/>' +
+        '<rect x="276" y="55" width="30" height="30" rx="5" fill="currentColor"/>' +
+      '</g>' +
+    '</svg>',
+
+    // 3 — Graduated stack (progression / hierarchy)
+    '<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+      '<g fill="currentColor">' +
+        '<rect x="160" y="38" width="80" height="16" rx="3" opacity="0.35"/>' +
+        '<rect x="140" y="62" width="120" height="16" rx="3" opacity="0.65"/>' +
+        '<rect x="120" y="86" width="160" height="16" rx="3"/>' +
+      '</g>' +
+    '</svg>',
+
+    // 4 — Node network (system / connections)
+    '<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+      '<g stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.55">' +
+        '<line x1="130" y1="45" x2="200" y2="70"/>' +
+        '<line x1="270" y1="45" x2="200" y2="70"/>' +
+        '<line x1="130" y1="95" x2="200" y2="70"/>' +
+        '<line x1="270" y1="95" x2="200" y2="70"/>' +
+        '<line x1="130" y1="45" x2="130" y2="95"/>' +
+        '<line x1="270" y1="45" x2="270" y2="95"/>' +
+      '</g>' +
+      '<g fill="currentColor">' +
+        '<circle cx="130" cy="45" r="6"/>' +
+        '<circle cx="270" cy="45" r="6"/>' +
+        '<circle cx="130" cy="95" r="6"/>' +
+        '<circle cx="270" cy="95" r="6"/>' +
+        '<circle cx="200" cy="70" r="8"/>' +
+      '</g>' +
+    '</svg>',
+
+    // 5 — Nested frames (containment / forges within forges)
+    '<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+      '<g fill="none" stroke="currentColor" stroke-width="2">' +
+        '<rect x="130" y="30" width="140" height="80" rx="6" opacity="0.35"/>' +
+        '<rect x="150" y="45" width="100" height="50" rx="5" opacity="0.65"/>' +
+        '<rect x="170" y="58" width="60" height="24" rx="4"/>' +
+      '</g>' +
+    '</svg>'
+  ];
+
+  function injectBanners(root) {
+    chapters.forEach(function (ch, idx) {
+      var banner = document.createElement('figure');
+      banner.className = 'chapter-banner';
+      banner.setAttribute('data-motif', String(idx % BANNER_MOTIFS.length));
+      banner.setAttribute('role', 'presentation');
+      banner.innerHTML = BANNER_MOTIFS[idx % BANNER_MOTIFS.length];
+      ch.el.parentNode.insertBefore(banner, ch.el);
     });
   }
 
